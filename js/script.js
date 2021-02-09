@@ -130,7 +130,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  //const modalTimerId = setTimeout(openModal, 6000);
+  const modalTimerId = setTimeout(openModal, 6000);
 
   function showModalByScroll() {
     if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
@@ -138,7 +138,6 @@ window.addEventListener('DOMContentLoaded', () => {
       window.removeEventListener('scroll', showModalByScroll);
     }
   }
-
   window.addEventListener('scroll', showModalByScroll);
 
   //CLASSES FOR CARDS
@@ -212,5 +211,44 @@ window.addEventListener('DOMContentLoaded', () => {
       'menu__item'
     ).render();
 
+    //FORMS
+
+    const forms = document.querySelectorAll('form');
+
+    const message = {
+      loading: 'Загрузка',
+      succsess: 'Спасибо, скоро мы с вами свяжемся!',
+      failure: 'Что-то пошло не так'
+    };
+
+    forms.forEach(item => {
+      postData(item);
+    });
+
+    function postData (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const statusMessage = document.createElement('div');
+        statusMessage.classList.add('status');
+        statusMessage.textContent = message.loading;
+        form.append(statusMessage);
+
+
+        const r = new XMLHttpRequest();
+        r.open('POST', 'server.php');
+        r.setRequestHeader('Content-type', 'multipart/form-data');
+        const formData = new FormData(form);
+        r.send(formData);
+        r.addEventListener('load', () => {
+          if (r.status===200) {
+            console.log(r.response);
+            statusMessage.textContent = message.succsess;
+          } else {
+            statusMessage.textContent = message.failure;
+          }
+        });
+      });
+    }
 
 });
